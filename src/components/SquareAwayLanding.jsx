@@ -1,4 +1,3 @@
-"use client";
 import '../index.css';
 
 import { useState, useEffect } from 'react';
