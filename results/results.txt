@@ -1,40 +1,20 @@
-Chapter 3.2
-Rolle's Theorem & Mean Value Theorem
+SCHEDULE
 
-□ Rolle's Theorem
-↳ If a function is continuous on a closed interval [a, b] and
-   differentiable on the open interval (a, b) and f(a) = f(b), then
-   there is at least one number in interval (a, b) where f'(c)=0.
+Setup **4-5pm**
+- Tanisha
+- Opal
+- Jay
+- Kaitlyn (will leave to get candy & supplies)
+- Cleo (maybe)
 
-EXAMPLE: Find 2 intercepts of f(x) = x²-3x+2 and show
-           f'(x)=0 at some point between the intercepts.
+Main Event 5-7pm
+- Opal
+- Kaitlyn
+- Jay
+- Aditi
+- Tanisha (might need to switch between tables)
+- Nikita
+* Lexi might come if debate finishes on time
 
-1) Set f(x) = 0
-   ↳ x² - 3x + 2 = 0
-   ↳ (x-1)(x-2) = 0
-   ↳ x = 1, 2
-2) f(a) = f(b)?
-   ↳ f(1) = f(2) = 0
-   ↳ interval = (1, 2)
-3) Find c where a < c < b by finding f'(x)
-   ↳ f(x) = x² - 3x + 2
-   ↳ f'(x) = 2x - 3
-   ↳ 0 = 2x - 3
-   ↳ x = 3/2
-     f'(3/2) = 0
-
-□ Mean Value Theorem
-↳ If a function is continuous on the closed interval [a,b] and
-   differentiable on the open interval (a,b), then there is a
-   number, c, in the open interval (a,b) where
-
-   f'(c) = (f(b) - f(a)) / (b - a)
-
-↳ "mean" refers to average rate of change of function's
-   interval [a,b].
-
-EXAMPLE: Find all values of c on interval [0,π] for f(x)=sinx.
-
-   f'(c) = (sin(π) - sin(0)) / (π - 0) = 0 / π = 0
-
-   f'(x) = cos x = 0 when x = π/2 (in interval [0,π])
+Cleanup 7-7:30
+- All * minus Lexi (maybe)

@@ -1,5 +1,6 @@
-# app.py
 from flask import Flask, request, jsonify
+from werkzeug.utils import secure_filename
+from flask_cors import CORS
 from google import genai
 from google.genai import types
 import os
@@ -9,7 +10,10 @@ import mimetypes
 import shutil
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv()
+
+app = Flask(__name__)
+CORS(app)
 
 UPLOAD_FOLDER = "uploads"
 RESULTS_FOLDER = "results"
@@ -26,10 +30,26 @@ def clear_folder(folder_path):
         elif os.path.isdir(file_path):
             shutil.rmtree(file_path)
 
+@app.route('/extract-text', methods=['POST'])
 def extractText():
     # 1. Clear uploads and results folders
-    # clear_folder(UPLOAD_FOLDER)
+    clear_folder(UPLOAD_FOLDER)
     clear_folder(RESULTS_FOLDER)
+
+    # --- 1. Handle multiple uploaded images ---
+    uploaded_files = request.files.getlist('images')
+
+    if not uploaded_files or uploaded_files == [None]:
+        return jsonify({"error": "No images uploaded"}), 400
+
+    for file in uploaded_files:
+        if file.filename == "":
+            continue
+        
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(save_path)
+        print(f"Saved uploaded image: {save_path}")
 
     API_KEY = os.getenv("GOOGLE_API_KEY")
     client = genai.Client(api_key=API_KEY)
@@ -70,12 +90,20 @@ def extractText():
             ]
         )
         extracted_text += response.text + "\n"
-    #here look over the extracted text and ensure that everything inside of it looks correct
+    
+    # Save to file
     results_file_path = os.path.join(RESULTS_FOLDER, "results.txt")
     with open(results_file_path, "w", encoding="utf-8") as f:
         f.write(extracted_text)
 
     print(f"\nAll results saved to {results_file_path}")
+    
+    # Return the extracted text in the response
+    return jsonify({
+        "status": "success", 
+        "results_file": results_file_path,
+        "extracted_text": extracted_text
+    })
 
 def createVideo(user_latex_here):
     model_api_key = os.getenv("MISTRAL_API_KEY")
@@ -123,7 +151,7 @@ def createVideo(user_latex_here):
             self.add_sound("stepX.mp3")  
             self.wait(...)  # placeholder duration  
 
-    No explanations or text outside the code block after the “Manim” signal. The video must be 1 minute maximum in length.
+    No explanations or text outside the code block after the "Manim" signal. The video must be 1 minute maximum in length.
 
     FULL REQUIREMENTS
     -----------------
@@ -173,7 +201,7 @@ def createVideo(user_latex_here):
     • Voiceovers must not overlap. Ensure all audio is 25% faster than normal by adjusting the edge-tts RATE parameter.  
     • Consider using scene transitions or clearing previous elements (e.g., self.clear()) between steps if needed.
 
-    4. The entire response below the “Manim” signal MUST be ONLY the code — no text outside a single Python script.
+    4. The entire response below the "Manim" signal MUST be ONLY the code — no text outside a single Python script.
 
     5. The very last lines of the script should include:
 
@@ -202,12 +230,30 @@ def createVideo(user_latex_here):
     llm_output = data["choices"][0]["message"]["content"]
 
     return llm_output
-    #use it like result = createVideo(r"\text{Some LaTeX here}")
 
-extractText()
 
-app = Flask(__name__)
+@app.route('/save-changed-notes', methods=['POST'])
+def save_changed_notes():
+    """Save edited notes content back to file"""
+    try:
+        data = request.json
+        content = data.get('changedNotes')
+        filename = data.get('filename', 'results.txt')
+        
+        if not content:
+            return jsonify({'error': 'No content provided'}), 400
+        
+        filepath = os.path.join(RESULTS_FOLDER, filename)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        print(f"Saved content to {filepath}")
+        return jsonify({'success': True, 'message': 'Content saved successfully'}), 200
+    
+    except Exception as e:
+        print(f"Error in save-changed-notes: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
-
