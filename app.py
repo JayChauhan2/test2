@@ -107,7 +107,7 @@ def extractText():
         "extracted_text": extracted_text
     })
 
-def createVideo(user_latex_here):
+def createVideo(user_text_here):
     model_api_key = os.getenv("MISTRAL_API_KEY")
     response = requests.post(
     url="https://openrouter.ai/api/v1/chat/completions",
@@ -126,43 +126,47 @@ def createVideo(user_latex_here):
     (1) Voiceover generation for each step using edge-tts, AND
     (2) A runnable Manim (v0.17+) animation that uses the generated audio files.
 
-    Before generating code, you MUST first **plan out the steps of the video**.  
-    For each step, give a brief high-level description of what will appear on screen and what the voiceover will summarize.  
+    Before generating code, you MUST first plan out the steps of the video.
+    For each step, give a brief high-level description of what will appear on
+    screen and what the voiceover will summarize.
+
     For example, a plan for a Rolle's Theorem and Mean Value Theorem video might be:
 
     <plan>
-    1. Introduction to both theorems and their importance  
-    2. Rolle's Theorem - statement and conditions  
-    3. Visual demonstration of Rolle's Theorem with graph  
-    4. Geometric interpretation of Rolle's Theorem  
-    5. Mean Value Theorem - statement and conditions  
-    6. Visual demonstration of MVT with graph showing tangent parallel to secant  
-    7. Connecting the two theorems - MVT as generalization  
-    8. Proof sketch showing the relationship  
-    9. Real-world applications  
+    1. Introduction to both theorems and their importance
+    2. Rolle's Theorem – statement and conditions
+    3. Visual demonstration of Rolle's Theorem with graph
+    4. Geometric interpretation of Rolle's Theorem
+    5. Mean Value Theorem – statement and conditions
+    6. Visual demonstration of MVT with graph showing tangent parallel to secant
+    7. Connecting the two theorems – MVT as generalization
+    8. Proof sketch showing the relationship
+    9. Real-world applications
     10. Summary of key concepts
     </plan>
 
-    Your output MUST first **say the planned steps aloud in natural language**. Then, immediately below, output a signal line containing only the word:
+    Your output MUST first say the planned steps aloud in natural language.
+    Then, immediately below, output a signal line containing only:
 
     Manim
 
-    Below that, you MUST generate **ONLY the Python code** — a single file that contains BOTH:  
-    • A block of edge-tts voiceover generators (step1, step2, ...)  
-    • A Manim Scene class that uses:  
-            self.add_sound("stepX.mp3")  
-            self.wait(...)  # placeholder duration  
+    Below that, you MUST generate ONLY the Python code — a single file that contains BOTH:
+    • A block of edge-tts voiceover generators (step1, step2, ...)
+    • A Manim Scene class that uses:
+            self.add_sound("stepX.mp3")
+            self.wait(...)  # placeholder duration
 
-    No explanations or text outside the code block after the "Manim" signal. The video must be 1 minute maximum in length.
+    No explanations or text outside the code block after the "Manim" signal.
+    The video must be under 1 minute in length.
 
     FULL REQUIREMENTS
     -----------------
-    1. Parse the provided LaTeX into logical steps:
-    - headings
-    - theorems
-    - explanations
-    - examples
-    - equations
+    1. Parse the provided normal text input into logical steps:
+       - headings
+       - important definitions
+       - explanations
+       - examples
+       - equations (if present in plain text)
 
     2. For EACH step i:
     Generate a Python function:
@@ -175,9 +179,9 @@ def createVideo(user_latex_here):
             RATE = "+25%"
             ... (full synchronous edge-tts code) ...
 
-    All voiceover functions MUST appear BEFORE the Manim code.  
-    • Voiceover text should be **high-level summaries** that explain the main ideas or highlight what is on the screen.  
-    • Do not read every formula or equation aloud; the text on screen provides the detailed content.
+    All voiceover functions MUST appear BEFORE the Manim code.
+    • Voiceover text should be high-level summaries that explain the main ideas.
+    • Do not read every equation aloud; the text on screen provides details.
 
     3. After generating all TTS blocks, generate a Manim Scene:
 
@@ -186,26 +190,26 @@ def createVideo(user_latex_here):
                 # Step 1 animation
                 <manim animations>
                 self.add_sound("step1.mp3")
-                self.wait(3)  # placeholder
+                self.wait(3)
 
                 # Step 2 animation
                 ...
                 self.add_sound("step2.mp3")
                 self.wait(3)
 
-    Animation requirements:
-    • Use a variety of different colors for text, lines, shapes, and graphs.  
-    • Ensure no two Manim elements overlap—adjust heights, positions, and coordinates.  
-    • All elements must be **fully visible on screen**; do not position anything so that it extends off-screen.  
-    • Each step should behave like a **mini-scene**: elements for that step appear together, then the next step transitions to a new arrangement. Do not keep stacking elements indefinitely.  
-    • Include graphs, plots, diagrams, and MathTex equations wherever possible.  
-    • Use Write(), FadeIn(), Transform(), MathTex(), Tex(), Circle(), Line(), Axes(), Plot(), etc. creatively for visual storytelling.  
-    • Voiceovers must not overlap. Ensure all audio is 25% faster than normal by adjusting the edge-tts RATE parameter.  
-    • Consider using scene transitions or clearing previous elements (e.g., self.clear()) between steps if needed.
+    Animation Requirements:
+    • Use a variety of different colors for text, lines, shapes, and graphs.
+    • Ensure no two Manim elements overlap—adjust positions appropriately.
+    • All elements must be fully visible on screen.
+    • Each step should behave like a mini-scene (use self.clear() if needed).
+    • Use Write(), FadeIn(), Transform(), MathTex(), Tex(), Axes(), Circle(),
+      Line(), Plot(), etc.
+    • Voiceovers must not overlap; ensure sequential playback.
+    • Set edge-tts RATE to +25%.
 
-    4. The entire response below the "Manim" signal MUST be ONLY the code — no text outside a single Python script.
+    4. Everything below the "Manim" signal must be only code in one file.
 
-    5. The very last lines of the script should include:
+    5. End the script with:
 
         if __name__ == "__main__":
             # generate all voiceovers
@@ -215,11 +219,12 @@ def createVideo(user_latex_here):
             # Manim render instructions as comments:
             # Run: manim -pqh script.py Explainer
 
-    6. The script MUST be ready to run immediately after pasting.
+    6. The script must be immediately runnable once pasted.
 
-    Here is the LaTeX content the script should explain:
+    Here is the text content the script should explain:
 
-    {user_latex_here}
+    {user_text_here}
+
 
     '''
         }
